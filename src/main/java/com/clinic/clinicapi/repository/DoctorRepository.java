@@ -8,6 +8,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 // This repository manages doctor data
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
-    // Get doctors page by page
-    Page<Doctor> findAll(Pageable pageable);
+    // Search doctors by name
+    Page<Doctor> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    // Search doctors by specialty
+    Page<Doctor> findBySpecialtyContainingIgnoreCase(String specialty, Pageable pageable);
+
+    // Search doctors by name and specialty
+    Page<Doctor> findByNameContainingIgnoreCaseAndSpecialtyContainingIgnoreCase(
+            String name,
+            String specialty,
+            Pageable pageable
+    );
 }
