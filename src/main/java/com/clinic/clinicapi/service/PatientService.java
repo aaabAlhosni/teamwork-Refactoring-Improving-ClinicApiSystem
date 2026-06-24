@@ -7,10 +7,11 @@ import com.clinic.clinicapi.exception.ResourceNotFoundException;
 import com.clinic.clinicapi.repository.PatientRepository;
 import com.clinic.clinicapi.repository.PatientSpecification;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 // Contains patient business logic
 @Service
@@ -70,6 +71,8 @@ public class PatientService {
                 PatientSpecification.build(name, phone, dobFrom, dobTo),
                 Sort.by(direction, sortField)
         );
+    // Get patients page by page
+    public Page<Patient> getAllPatients(Pageable pageable) {
+        return patientRepository.findAll(pageable);
     }
 }
-

@@ -3,9 +3,13 @@ package com.clinic.clinicapi.controller;
 import com.clinic.clinicapi.dto.PatientRequest;
 import com.clinic.clinicapi.entity.Patient;
 import com.clinic.clinicapi.entity.Visit;
+import com.clinic.clinicapi.exception.BadRequestException;
 import com.clinic.clinicapi.service.PatientService;
 import com.clinic.clinicapi.service.VisitService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +53,22 @@ public class PatientController {
             @RequestParam(required = false, defaultValue = "asc") String sortDir) {
 
         return patientService.getAllPatients(name, phone, ageMin, ageMax, sortBy, sortDir);
+    // Get patients page by page
+    @GetMapping
+    public Page<Patient> getAllPatients(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        // Page cannot be negative and size must be at least 1
+        if (page < 0 || size < 1) {
+            throw new BadRequestException(
+                    "Page must be 0 or more and size must be at least 1"
+            );
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return patientService.getAllPatients(pageable);
     }
 
     // Get one patient by ID
@@ -67,5 +87,3 @@ public class PatientController {
         return visitService.getPatientHistory(patientId);
     }
 }
-
-
