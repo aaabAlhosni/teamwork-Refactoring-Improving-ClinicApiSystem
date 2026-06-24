@@ -45,14 +45,7 @@ public class PatientController {
         return new ResponseEntity<>(patient, HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public List<PatientResponseDto> getAllPatients() {
-
-        return patientService.getAllPatients()
-                .stream()
-                .map(PatientResponseDto::from)
-                .toList();
-    // Get patients page by page
+    // Get all patients page by page
     @GetMapping
     public Page<Patient> getAllPatients(
             @RequestParam(defaultValue = "0") int page,
