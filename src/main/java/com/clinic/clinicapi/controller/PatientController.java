@@ -1,6 +1,8 @@
 package com.clinic.clinicapi.controller;
 
 import com.clinic.clinicapi.dto.PatientRequest;
+import com.clinic.clinicapi.dto.PatientResponseDto;
+import com.clinic.clinicapi.dto.VisitResponseDto;
 import com.clinic.clinicapi.entity.Patient;
 import com.clinic.clinicapi.entity.Visit;
 import com.clinic.clinicapi.exception.BadRequestException;
@@ -32,16 +34,24 @@ public class PatientController {
         this.visitService = visitService;
     }
 
-    // Create a new patient
     @PostMapping
-    public ResponseEntity<Patient> createPatient(
+    public ResponseEntity<PatientResponseDto> createPatient(
             @Valid @RequestBody PatientRequest request) {
 
-        Patient patient = patientService.createPatient(request);
+        PatientResponseDto patient =
+                PatientResponseDto.from(
+                        patientService.createPatient(request));
 
         return new ResponseEntity<>(patient, HttpStatus.CREATED);
     }
 
+    @GetMapping
+    public List<PatientResponseDto> getAllPatients() {
+
+        return patientService.getAllPatients()
+                .stream()
+                .map(PatientResponseDto::from)
+                .toList();
     // Get patients page by page
     @GetMapping
     public Page<Patient> getAllPatients(
@@ -60,19 +70,21 @@ public class PatientController {
         return patientService.getAllPatients(pageable);
     }
 
-    // Get one patient by ID
     @GetMapping("/{patientId}")
-    public Patient getPatientById(
+    public PatientResponseDto getPatientById(
             @PathVariable("patientId") Long patientId) {
 
-        return patientService.getPatientById(patientId);
+        return PatientResponseDto.from(
+                patientService.getPatientById(patientId));
     }
 
-    // Get full visit history for one patient
     @GetMapping("/{patientId}/history")
-    public List<Visit> getPatientHistory(
+    public List<VisitResponseDto> getPatientHistory(
             @PathVariable("patientId") Long patientId) {
 
-        return visitService.getPatientHistory(patientId);
+        return visitService.getPatientHistory(patientId)
+                .stream()
+                .map(VisitResponseDto::from)
+                .toList();
     }
 }

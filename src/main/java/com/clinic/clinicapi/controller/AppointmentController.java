@@ -1,10 +1,10 @@
 package com.clinic.clinicapi.controller;
 
 import com.clinic.clinicapi.dto.AppointmentRequest;
+import com.clinic.clinicapi.dto.AppointmentResponseDto;
 import com.clinic.clinicapi.dto.RescheduleRequest;
 import com.clinic.clinicapi.dto.VisitRequest;
-import com.clinic.clinicapi.entity.Appointment;
-import com.clinic.clinicapi.entity.Visit;
+import com.clinic.clinicapi.dto.VisitResponseDto;
 import com.clinic.clinicapi.service.AppointmentService;
 import com.clinic.clinicapi.service.VisitService;
 import jakarta.validation.Valid;
@@ -30,50 +30,55 @@ public class AppointmentController {
 
     // Book an appointment
     @PostMapping
-    public ResponseEntity<Appointment> bookAppointment(
+    public ResponseEntity<AppointmentResponseDto> bookAppointment(
             @Valid @RequestBody AppointmentRequest request) {
 
-        Appointment appointment =
-                appointmentService.bookAppointment(request);
+        AppointmentResponseDto appointment =
+                AppointmentResponseDto.from(
+                        appointmentService.bookAppointment(request));
 
         return new ResponseEntity<>(appointment, HttpStatus.CREATED);
     }
 
     // Cancel an appointment without deleting it
     @PostMapping("/{appointmentId}/cancel")
-    public Appointment cancelAppointment(
+    public AppointmentResponseDto cancelAppointment(
             @PathVariable("appointmentId") Long appointmentId) {
 
-        return appointmentService.cancelAppointment(appointmentId);
+        return AppointmentResponseDto.from(
+                appointmentService.cancelAppointment(appointmentId));
     }
 
     // Reschedule an appointment to a new slot
     @PostMapping("/{appointmentId}/reschedule")
-    public Appointment rescheduleAppointment(
+    public AppointmentResponseDto rescheduleAppointment(
             @PathVariable("appointmentId") Long appointmentId,
             @Valid @RequestBody RescheduleRequest request) {
 
-        return appointmentService
-                .rescheduleAppointment(appointmentId, request);
+        return AppointmentResponseDto.from(
+                appointmentService
+                        .rescheduleAppointment(appointmentId, request));
     }
 
     // Record diagnosis and prescription
     @PostMapping("/{appointmentId}/visit")
-    public ResponseEntity<Visit> recordVisit(
+    public ResponseEntity<VisitResponseDto> recordVisit(
             @PathVariable("appointmentId") Long appointmentId,
             @Valid @RequestBody VisitRequest request) {
 
-        Visit visit = visitService.recordVisit(appointmentId, request);
+        VisitResponseDto visit =
+                VisitResponseDto.from(
+                        visitService.recordVisit(appointmentId, request));
 
         return new ResponseEntity<>(visit, HttpStatus.CREATED);
     }
 
     // Get one appointment by ID
     @GetMapping("/{appointmentId}")
-    public Appointment getAppointmentById(
+    public AppointmentResponseDto getAppointmentById(
             @PathVariable("appointmentId") Long appointmentId) {
 
-        return appointmentService.getAppointmentById(appointmentId);
+        return AppointmentResponseDto.from(
+                appointmentService.getAppointmentById(appointmentId));
     }
 }
-
