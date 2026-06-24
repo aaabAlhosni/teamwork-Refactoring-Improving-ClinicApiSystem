@@ -2,7 +2,9 @@ package com.clinic.clinicapi.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
@@ -10,11 +12,14 @@ import java.time.LocalDate;
 public class PatientRequest {
 
     // Patient name cannot be empty
-    @NotBlank
+    @NotBlank(message = "Patient name is required")
+    @Size(min = 2, max = 100, message = "Patient name must be between 2 and 100 characters")
+    @Pattern(regexp = "^[A-Za-z ]+$", message = "Patient name can contain letters and spaces only")
     private String name;
 
     // Date of birth is required
-    @NotNull
+    @NotNull(message = "Date of birth is required")
+    @Past(message = "Date of birth must be in the past")
     private LocalDate dateOfBirth;
 
     // Phone must be 8 digits and start with 9

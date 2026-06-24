@@ -2,7 +2,6 @@ package com.clinic.clinicapi.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -38,23 +37,25 @@ public class GlobalExceptionHandler {
         return createResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
-    // Returns 400 when validation annotations fail
+    // Returns 400 when request validation fails
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationError(
+    public ResponseEntity<Map<String, Object>> handleValidationErrors(
             MethodArgumentNotValidException exception) {
 
-        FieldError fieldError = exception.getBindingResult().getFieldError();
+        Map<String, String> errors = new HashMap<>();
 
-        String message = "Invalid input";
+        exception.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
 
-        if (fieldError != null) {
-            message = fieldError.getDefaultMessage();
-        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Validation failed");
+        response.put("errors", errors);
 
-        return createResponse(HttpStatus.BAD_REQUEST, message);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    // Creates a simple JSON error message
+    // Creates a simple JSON error response
     private ResponseEntity<Map<String, String>> createResponse(
             HttpStatus status, String message) {
 
