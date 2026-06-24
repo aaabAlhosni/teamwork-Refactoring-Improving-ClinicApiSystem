@@ -20,7 +20,7 @@ controller  : Receives API requests.
 service     : Contains business rules.
 repository  : Communicates with the database.
 entity      : Represents database tables.
-dto         : Receives request data.
+dto         : Handles request and response data transfer.
 exception   : Handles errors.
 
 ## Main Features
@@ -111,7 +111,7 @@ Examples of validations:
 
 * Required fields cannot be null or blank.
 * Names must have a valid length.
-* Phone numbers must contain 8 to 15 digits and may start with `+`.
+* Phone numbers must be exactly 8 digits and must start with 9 (e.g. `91234567`).
 * Date of birth must be in the past.
 * Slot dates cannot be in the past.
 * IDs must be greater than 0.
@@ -127,7 +127,7 @@ Example validation error response:
   "errors": {
     "name": "Patient name is required",
     "dateOfBirth": "Date of birth must be in the past",
-    "phone": "Phone number must contain 8 to 15 digits and may start with +"
+    "phone": "Phone number must be 8 digits and start with 9"
   }
 }
 ```
@@ -249,7 +249,7 @@ Request body:
 {
   "name": "Safa Ahmed",
   "dateOfBirth": "2001-02-05",
-  "phone": "+96891234567"
+  "phone": "91234567"
 }
 ```
 
@@ -306,6 +306,506 @@ Request body:
   "prescription": "Rest and drink fluids"
 }
 ```
+
+## How to Test the API
+
+> Start the app first, then send requests using Postman or any HTTP client at `http://localhost:8080`.
+> Follow the order below — create a doctor first, then generate slots, then create a patient, then book an appointment.
+
+---
+
+### 1. Create a Doctor
+
+```http
+POST /api/doctors
+Content-Type: application/json
+```
+
+Request body:
+
+```json
+{
+  "name": "Dr. Ali Hassan",
+  "specialty": "CARDIOLOGY",
+  "workingStart": "08:00",
+  "workingEnd": "16:00"
+}
+```
+
+Expected status: `201 Created`
+
+Expected response:
+
+```json
+{
+  "id": 1,
+  "name": "Dr. Ali Hassan",
+  "specialty": "CARDIOLOGY",
+  "workingStart": "08:00:00",
+  "workingEnd": "16:00:00"
+}
+```
+
+---
+
+### 2. Get All Doctors (Paginated)
+
+```http
+GET /api/doctors?page=0&size=5
+```
+
+Expected status: `200 OK`
+
+Returns a paginated list of all doctors.
+
+---
+
+### 3. Search Doctors by Name
+
+```http
+GET /api/doctors?name=Ali
+```
+
+Expected status: `200 OK`
+
+Returns all doctors whose name contains "Ali".
+
+---
+
+### 4. Filter Doctors by Specialty
+
+```http
+GET /api/doctors?specialty=CARDIOLOGY
+```
+
+Expected status: `200 OK`
+
+Returns all doctors with the CARDIOLOGY specialty.
+
+---
+
+### 5. Search by Name and Specialty
+
+```http
+GET /api/doctors?name=Ali&specialty=CARDIOLOGY
+```
+
+Expected status: `200 OK`
+
+Returns doctors matching both filters.
+
+---
+
+### 6. Get Doctor by ID
+
+```http
+GET /api/doctors/1
+```
+
+Expected status: `200 OK`
+
+Expected response:
+
+```json
+{
+  "id": 1,
+  "name": "Dr. Ali Hassan",
+  "specialty": "CARDIOLOGY",
+  "workingStart": "08:00:00",
+  "workingEnd": "16:00:00"
+}
+```
+
+---
+
+### 7. Generate Appointment Slots for a Doctor
+
+```http
+POST /api/doctors/1/slots
+Content-Type: application/json
+```
+
+Request body:
+
+```json
+{
+  "date": "2026-07-01"
+}
+```
+
+Expected status: `201 Created`
+
+Expected response (list of 30-minute slots from 08:00 to 16:00):
+
+```json
+[
+  {
+    "id": 1,
+    "doctorId": 1,
+    "doctorName": "Dr. Ali Hassan",
+    "slotDate": "2026-07-01",
+    "startTime": "08:00:00",
+    "endTime": "08:30:00",
+    "available": true
+  },
+  {
+    "id": 2,
+    "doctorId": 1,
+    "doctorName": "Dr. Ali Hassan",
+    "slotDate": "2026-07-01",
+    "startTime": "08:30:00",
+    "endTime": "09:00:00",
+    "available": true
+  }
+]
+```
+
+---
+
+### 8. View Doctor Schedule for a Date
+
+```http
+GET /api/doctors/1/schedule?date=2026-07-01
+```
+
+Expected status: `200 OK`
+
+Returns all slots for doctor 1 on that date, showing which are available.
+
+---
+
+### 9. Create a Patient
+
+```http
+POST /api/patients
+Content-Type: application/json
+```
+
+Request body:
+
+```json
+{
+  "name": "Sara Ahmed",
+  "dateOfBirth": "1995-03-15",
+  "phone": "91234567"
+}
+```
+
+Expected status: `201 Created`
+
+Expected response:
+
+```json
+{
+  "id": 1,
+  "name": "Sara Ahmed",
+  "dateOfBirth": "1995-03-15",
+  "phone": "91234567"
+}
+```
+
+---
+
+### 10. Get All Patients (Paginated)
+
+```http
+GET /api/patients?page=0&size=5
+```
+
+Expected status: `200 OK`
+
+Returns a paginated list of all patients.
+
+---
+
+### 11. Get Patient by ID
+
+```http
+GET /api/patients/1
+```
+
+Expected status: `200 OK`
+
+Expected response:
+
+```json
+{
+  "id": 1,
+  "name": "Sara Ahmed",
+  "dateOfBirth": "1995-03-15",
+  "phone": "91234567"
+}
+```
+
+---
+
+### 12. Book an Appointment
+
+```http
+POST /api/appointments
+Content-Type: application/json
+```
+
+Request body:
+
+```json
+{
+  "patientId": 1,
+  "slotId": 1
+}
+```
+
+Expected status: `201 Created`
+
+Expected response:
+
+```json
+{
+  "id": 1,
+  "patientId": 1,
+  "patientName": "Sara Ahmed",
+  "slotId": 1,
+  "doctorId": 1,
+  "doctorName": "Dr. Ali Hassan",
+  "status": "BOOKED",
+  "rescheduledToId": null
+}
+```
+
+---
+
+### 13. Get Appointment by ID
+
+```http
+GET /api/appointments/1
+```
+
+Expected status: `200 OK`
+
+Returns the appointment details including current status.
+
+---
+
+### 14. Cancel an Appointment
+
+```http
+POST /api/appointments/1/cancel
+```
+
+Expected status: `200 OK`
+
+Expected response:
+
+```json
+{
+  "id": 1,
+  "patientId": 1,
+  "patientName": "Sara Ahmed",
+  "slotId": 1,
+  "doctorId": 1,
+  "doctorName": "Dr. Ali Hassan",
+  "status": "CANCELLED",
+  "rescheduledToId": null
+}
+```
+
+The appointment is not deleted — its status changes to `CANCELLED`.
+
+---
+
+### 15. Reschedule an Appointment
+
+Book a new appointment first (step 12) to get a BOOKED appointment, then:
+
+```http
+POST /api/appointments/1/reschedule
+Content-Type: application/json
+```
+
+Request body:
+
+```json
+{
+  "newSlotId": 2
+}
+```
+
+Expected status: `200 OK`
+
+Expected response (the new appointment):
+
+```json
+{
+  "id": 2,
+  "patientId": 1,
+  "patientName": "Sara Ahmed",
+  "slotId": 2,
+  "doctorId": 1,
+  "doctorName": "Dr. Ali Hassan",
+  "status": "BOOKED",
+  "rescheduledToId": null
+}
+```
+
+The original appointment (id: 1) status becomes `RESCHEDULED` and links to the new one.
+
+---
+
+### 16. Record a Visit
+
+Only works on a BOOKED appointment after the slot's end time has passed.
+
+```http
+POST /api/appointments/1/visit
+Content-Type: application/json
+```
+
+Request body:
+
+```json
+{
+  "diagnosis": "Hypertension stage 1",
+  "prescription": "Losartan 50mg once daily for 30 days"
+}
+```
+
+Expected status: `201 Created`
+
+Expected response:
+
+```json
+{
+  "id": 1,
+  "appointmentId": 1,
+  "patientId": 1,
+  "patientName": "Sara Ahmed",
+  "diagnosis": "Hypertension stage 1",
+  "prescription": "Losartan 50mg once daily for 30 days"
+}
+```
+
+---
+
+### 17. View Patient Visit History
+
+```http
+GET /api/patients/1/history
+```
+
+Expected status: `200 OK`
+
+Expected response:
+
+```json
+[
+  {
+    "id": 1,
+    "appointmentId": 1,
+    "patientId": 1,
+    "patientName": "Sara Ahmed",
+    "diagnosis": "Hypertension stage 1",
+    "prescription": "Losartan 50mg once daily for 30 days"
+  }
+]
+```
+
+---
+
+### Validation Error Examples
+
+**Invalid doctor name (contains numbers):**
+
+```http
+POST /api/doctors
+```
+
+```json
+{ "name": "Dr4 Ali", "specialty": "CARDIOLOGY", "workingStart": "08:00", "workingEnd": "16:00" }
+```
+
+Expected: `400 Bad Request`
+
+```json
+{ "message": "Validation failed", "errors": { "name": "Doctor name must contain only letters, spaces, and dots" } }
+```
+
+---
+
+**Invalid specialty (not in enum):**
+
+```http
+POST /api/doctors
+```
+
+```json
+{ "name": "Dr. Ali", "specialty": "Heart Doctor", "workingStart": "08:00", "workingEnd": "16:00" }
+```
+
+Expected: `400 Bad Request`
+
+```json
+{ "message": "Invalid request value", "error": "Specialty must be one of: [GENERAL_MEDICINE, CARDIOLOGY, ...]" }
+```
+
+---
+
+**Slot date in the past:**
+
+```http
+POST /api/doctors/1/slots
+```
+
+```json
+{ "date": "2020-01-01" }
+```
+
+Expected: `400 Bad Request`
+
+---
+
+**Invalid phone number:**
+
+```http
+POST /api/patients
+```
+
+```json
+{ "name": "Sara Ahmed", "dateOfBirth": "1995-03-15", "phone": "12345678" }
+```
+
+Expected: `400 Bad Request`
+
+```json
+{ "message": "Validation failed", "errors": { "phone": "Phone number must be 8 digits and start with 9" } }
+```
+
+---
+
+**Booking an already-booked slot:**
+
+```http
+POST /api/appointments
+```
+
+```json
+{ "patientId": 2, "slotId": 1 }
+```
+
+Expected: `409 Conflict`
+
+---
+
+**Recording a visit on a non-BOOKED appointment:**
+
+```http
+POST /api/appointments/1/visit
+```
+
+```json
+{ "diagnosis": "Flu", "prescription": "Rest" }
+```
+
+Expected: `400 Bad Request` (if appointment is CANCELLED or not yet past end time)
 
 ## HTTP Status Codes
 
