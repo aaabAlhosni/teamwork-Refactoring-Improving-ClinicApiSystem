@@ -53,7 +53,7 @@ How to Run the Project
 2. Make sure Java 17 is selected as the project SDK.
 3. Open ClinicApiApplication.java.
 4. Click the green Run button next to the main method.
-5. Wait until the console shows:
+5.  Wait until the console shows:
    Started ClinicApiApplication
 
 Application URL
