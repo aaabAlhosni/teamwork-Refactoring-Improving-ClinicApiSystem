@@ -31,7 +31,7 @@ public class DoctorResponseDto {
         return new DoctorResponseDto(
                 doctor.getId(),
                 doctor.getName(),
-                doctor.getSpecialty(),
+                doctor.getSpecialty() != null ? doctor.getSpecialty().name() : null,
                 doctor.getWorkingStart(),
                 doctor.getWorkingEnd()
         );
