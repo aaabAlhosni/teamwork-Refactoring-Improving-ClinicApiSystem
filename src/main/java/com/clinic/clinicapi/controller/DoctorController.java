@@ -5,6 +5,7 @@ import com.clinic.clinicapi.dto.GenerateSlotsRequest;
 import com.clinic.clinicapi.dto.AppointmentSlotResponseDto;
 import com.clinic.clinicapi.dto.DoctorResponseDto;
 import com.clinic.clinicapi.entity.Doctor;
+import com.clinic.clinicapi.entity.Specialty;
 import com.clinic.clinicapi.exception.BadRequestException;
 import com.clinic.clinicapi.service.AppointmentSlotService;
 import com.clinic.clinicapi.service.DoctorService;
@@ -52,7 +53,7 @@ public class DoctorController {
     @GetMapping
     public Page<Doctor> getAllDoctors(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String specialty,
+            @RequestParam(required = false) Specialty specialty,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
 

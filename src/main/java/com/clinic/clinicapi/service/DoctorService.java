@@ -2,6 +2,7 @@ package com.clinic.clinicapi.service;
 
 import com.clinic.clinicapi.dto.DoctorRequest;
 import com.clinic.clinicapi.entity.Doctor;
+import com.clinic.clinicapi.entity.Specialty;
 import com.clinic.clinicapi.exception.BadRequestException;
 import com.clinic.clinicapi.exception.ResourceNotFoundException;
 import com.clinic.clinicapi.repository.DoctorRepository;
@@ -51,17 +52,17 @@ public class DoctorService {
     // Get doctors page by page with optional search filters
     public Page<Doctor> getAllDoctors(
             String name,
-            String specialty,
+            Specialty specialty,
             Pageable pageable) {
 
         boolean hasName = name != null && !name.trim().isEmpty();
-        boolean hasSpecialty = specialty != null && !specialty.trim().isEmpty();
+        boolean hasSpecialty = specialty != null;
 
         if (hasName && hasSpecialty) {
             return doctorRepository
-                    .findByNameContainingIgnoreCaseAndSpecialtyContainingIgnoreCase(
+                    .findByNameContainingIgnoreCaseAndSpecialty(
                             name.trim(),
-                            specialty.trim(),
+                            specialty,
                             pageable
                     );
         }
@@ -76,8 +77,8 @@ public class DoctorService {
 
         if (hasSpecialty) {
             return doctorRepository
-                    .findBySpecialtyContainingIgnoreCase(
-                            specialty.trim(),
+                    .findBySpecialty(
+                            specialty,
                             pageable
                     );
         }
