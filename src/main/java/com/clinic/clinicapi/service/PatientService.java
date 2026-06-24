@@ -5,10 +5,11 @@ import com.clinic.clinicapi.entity.Patient;
 import com.clinic.clinicapi.exception.BadRequestException;
 import com.clinic.clinicapi.exception.ResourceNotFoundException;
 import com.clinic.clinicapi.repository.PatientRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 // Contains patient business logic
 @Service
@@ -48,9 +49,8 @@ public class PatientService {
                 );
     }
 
-    // Get all patients
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
+    // Get patients page by page
+    public Page<Patient> getAllPatients(Pageable pageable) {
+        return patientRepository.findAll(pageable);
     }
 }
-
