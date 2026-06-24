@@ -2,6 +2,7 @@ package com.clinic.clinicapi.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 
@@ -16,8 +17,12 @@ public class PatientRequest {
     @NotNull
     private LocalDate dateOfBirth;
 
-    // Phone number cannot be empty
+    // Phone must be 8 digits and start with 9
     @NotBlank
+    @Pattern(
+            regexp = "^9\\d{7}$",
+            message = "Phone number must be 8 digits and start with 9"
+    )
     private String phone;
 
     public String getName() {
@@ -44,5 +49,3 @@ public class PatientRequest {
         this.phone = phone;
     }
 }
-
-
