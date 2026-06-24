@@ -1,0 +1,120 @@
+Clinic API Test Commands
+
+Base URL
+http://localhost:8080
+
+Replace doctorId, patientId, slotId, and appointmentId with the real IDs returned by the API.
+
+1. Create Doctor
+Method: POST
+URL: http://localhost:8080/api/doctors
+Body:
+{
+  "name": "Dr. Sara Ahmed",
+  "specialty": "General Medicine",
+  "workingStart": "09:00",
+  "workingEnd": "12:00"
+}
+Expected result: 201 Created
+
+2. Create Patient
+Method: POST
+URL: http://localhost:8080/api/patients
+Body:
+{
+  "name": "Ahmed Al Balushi",
+  "dateOfBirth": "2004-05-12",
+  "phone": "91234567"
+}
+Expected result: 201 Created
+
+3. Generate Doctor Slots
+Method: POST
+URL: http://localhost:8080/api/doctors/{doctorId}/slots
+Body:
+{
+  "date": "2030-01-01"
+}
+Expected result: 201 Created
+
+4. View Doctor Schedule
+Method: GET
+URL: http://localhost:8080/api/doctors/{doctorId}/schedule?date=2030-01-01
+
+5. Book Appointment
+Method: POST
+URL: http://localhost:8080/api/appointments
+Body:
+{
+  "patientId": 1,
+  "slotId": 1
+}
+Expected result: 201 Created
+
+6. Get One Appointment
+Method: GET
+URL: http://localhost:8080/api/appointments/{appointmentId}
+
+7. Reschedule Appointment
+Method: POST
+URL: http://localhost:8080/api/appointments/{appointmentId}/reschedule
+Body:
+{
+  "newSlotId": 2
+}
+Expected result:
+- Old appointment status becomes RESCHEDULED.
+- New appointment status becomes BOOKED.
+
+8. Cancel Appointment
+Method: POST
+URL: http://localhost:8080/api/appointments/{appointmentId}/cancel
+Expected result:
+- Appointment status becomes CANCELLED.
+- The old slot becomes available again.
+
+9. Record Visit
+Method: POST
+URL: http://localhost:8080/api/appointments/{appointmentId}/visit
+Body:
+{
+  "diagnosis": "Seasonal allergy",
+  "prescription": "Antihistamine once daily"
+}
+Expected result:
+- 201 Created
+- Appointment status becomes COMPLETED.
+
+10. Get Patient Visit History
+Method: GET
+URL: http://localhost:8080/api/patients/{patientId}/history
+
+Business Rule Tests
+
+Test A: Double Booking Prevention
+1. Book a slot for Patient 1.
+2. Try to book the same slot for Patient 2.
+Expected result:
+409 Conflict
+This appointment slot is already booked.
+
+Test B: Same Patient Cannot Have Two Active Appointments
+1. Book one slot for a patient.
+2. Try to book another slot with the same doctor on the same date.
+Expected result:
+409 Conflict
+Patient already has a booked appointment with this doctor on this day.
+
+Test C: Visit Cannot Be Recorded for a Cancelled Appointment
+1. Cancel an appointment.
+2. Try to record a visit for it.
+Expected result:
+409 Conflict
+Visit can only be recorded for a booked appointment.
+
+Test D: Visit Cannot Be Recorded for a Future Appointment
+1. Create a future appointment.
+2. Try to record a visit before the appointment ends.
+Expected result:
+400 Bad Request
+Cannot record a visit before the appointment time ends.
