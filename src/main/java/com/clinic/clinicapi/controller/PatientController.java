@@ -38,10 +38,17 @@ public class PatientController {
         return new ResponseEntity<>(patient, HttpStatus.CREATED);
     }
 
-    // Get all patients
+    // Get all patients with optional name, phone, age range filters, and sorting
     @GetMapping
-    public List<Patient> getAllPatients() {
-        return patientService.getAllPatients();
+    public List<Patient> getAllPatients(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) Integer ageMin,
+            @RequestParam(required = false) Integer ageMax,
+            @RequestParam(required = false, defaultValue = "id") String sortBy,
+            @RequestParam(required = false, defaultValue = "asc") String sortDir) {
+
+        return patientService.getAllPatients(name, phone, ageMin, ageMax, sortBy, sortDir);
     }
 
     // Get one patient by ID

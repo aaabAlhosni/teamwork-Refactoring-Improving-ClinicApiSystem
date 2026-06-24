@@ -5,6 +5,8 @@ import com.clinic.clinicapi.entity.Patient;
 import com.clinic.clinicapi.exception.BadRequestException;
 import com.clinic.clinicapi.exception.ResourceNotFoundException;
 import com.clinic.clinicapi.repository.PatientRepository;
+import com.clinic.clinicapi.repository.PatientSpecification;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -48,9 +50,26 @@ public class PatientService {
                 );
     }
 
-    // Get all patients
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
+    // Get all patients with optional name, phone, age range filters, and sorting
+    public List<Patient> getAllPatients(String name, String phone, Integer ageMin, Integer ageMax,
+                                       String sortBy, String sortDir) {
+        LocalDate dobFrom = (ageMax != null) ? LocalDate.now().minusYears(ageMax) : null;
+        LocalDate dobTo   = (ageMin != null) ? LocalDate.now().minusYears(ageMin) : null;
+
+        String sortField = switch (sortBy == null ? "" : sortBy) {
+            case "age"  -> "dateOfBirth";
+            case "name" -> "name";
+            default     -> "id";
+        };
+
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir)
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        return patientRepository.findAll(
+                PatientSpecification.build(name, phone, dobFrom, dobTo),
+                Sort.by(direction, sortField)
+        );
     }
 }
 
