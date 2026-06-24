@@ -2,6 +2,8 @@ package com.clinic.clinicapi.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -20,7 +22,7 @@ public class GlobalExceptionHandler {
         return createResponse(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
-    // Returns 409 when a business rule is broken
+    // Returns 409 when a rule is broken
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<Map<String, String>> handleConflict(
             ConflictException exception) {
@@ -28,7 +30,7 @@ public class GlobalExceptionHandler {
         return createResponse(HttpStatus.CONFLICT, exception.getMessage());
     }
 
-    // Returns 400 when input data is not valid
+    // Returns 400 when input is not valid
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Map<String, String>> handleBadRequest(
             BadRequestException exception) {
@@ -36,7 +38,23 @@ public class GlobalExceptionHandler {
         return createResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
-    // Creates a simple JSON error response
+    // Returns 400 when validation annotations fail
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationError(
+            MethodArgumentNotValidException exception) {
+
+        FieldError fieldError = exception.getBindingResult().getFieldError();
+
+        String message = "Invalid input";
+
+        if (fieldError != null) {
+            message = fieldError.getDefaultMessage();
+        }
+
+        return createResponse(HttpStatus.BAD_REQUEST, message);
+    }
+
+    // Creates a simple JSON error message
     private ResponseEntity<Map<String, String>> createResponse(
             HttpStatus status, String message) {
 
@@ -46,4 +64,3 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, status);
     }
 }
-
