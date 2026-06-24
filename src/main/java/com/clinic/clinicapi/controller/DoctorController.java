@@ -2,8 +2,8 @@ package com.clinic.clinicapi.controller;
 
 import com.clinic.clinicapi.dto.DoctorRequest;
 import com.clinic.clinicapi.dto.GenerateSlotsRequest;
-import com.clinic.clinicapi.entity.AppointmentSlot;
-import com.clinic.clinicapi.entity.Doctor;
+import com.clinic.clinicapi.dto.AppointmentSlotResponseDto;
+import com.clinic.clinicapi.dto.DoctorResponseDto;
 import com.clinic.clinicapi.service.AppointmentSlotService;
 import com.clinic.clinicapi.service.DoctorService;
 import jakarta.validation.Valid;
@@ -32,50 +32,60 @@ public class DoctorController {
     }
 
     // Create a new doctor
-    @PostMapping
-    public ResponseEntity<Doctor> createDoctor(
+    public ResponseEntity<DoctorResponseDto> createDoctor(
             @Valid @RequestBody DoctorRequest request) {
 
-        Doctor doctor = doctorService.createDoctor(request);
+        DoctorResponseDto doctor =
+                DoctorResponseDto.from(
+                        doctorService.createDoctor(request));
 
         return new ResponseEntity<>(doctor, HttpStatus.CREATED);
     }
 
     // Get all doctors
-    @GetMapping
-    public List<Doctor> getAllDoctors() {
-        return doctorService.getAllDoctors();
+    public List<DoctorResponseDto> getAllDoctors() {
+
+        return doctorService.getAllDoctors()
+                .stream()
+                .map(DoctorResponseDto::from)
+                .toList();
     }
 
     // Get one doctor by ID
-    @GetMapping("/{doctorId}")
-    public Doctor getDoctorById(
+    public DoctorResponseDto getDoctorById(
             @PathVariable("doctorId") Long doctorId) {
 
-        return doctorService.getDoctorById(doctorId);
+        return DoctorResponseDto.from(
+                doctorService.getDoctorById(doctorId));
     }
 
     // Generate slots for a doctor on one date
     @PostMapping("/{doctorId}/slots")
-    public ResponseEntity<List<AppointmentSlot>> generateSlots(
+    public ResponseEntity<List<AppointmentSlotResponseDto>> generateSlots(
             @PathVariable("doctorId") Long doctorId,
             @Valid @RequestBody GenerateSlotsRequest request) {
 
-        List<AppointmentSlot> slots =
-                appointmentSlotService.generateSlots(doctorId, request);
+        List<AppointmentSlotResponseDto> slots =
+                appointmentSlotService.generateSlots(doctorId, request)
+                        .stream()
+                        .map(AppointmentSlotResponseDto::from)
+                        .toList();
 
         return new ResponseEntity<>(slots, HttpStatus.CREATED);
     }
 
     // View doctor schedule for one date
     @GetMapping("/{doctorId}/schedule")
-    public List<AppointmentSlot> getDoctorSchedule(
+    public List<AppointmentSlotResponseDto> getDoctorSchedule(
             @PathVariable("doctorId") Long doctorId,
             @RequestParam("date")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate date) {
 
-        return appointmentSlotService.getDoctorSchedule(doctorId, date);
+        return appointmentSlotService.getDoctorSchedule(doctorId, date)
+                .stream()
+                .map(AppointmentSlotResponseDto::from)
+                .toList();
     }
 }
 
