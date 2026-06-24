@@ -73,6 +73,11 @@ API Endpoints
 Doctors
 POST /api/doctors
 GET  /api/doctors
+GET  /api/doctors?name={name}
+GET  /api/doctors?specialty={specialty}
+GET  /api/doctors?name={name}&specialty={specialty}
+Doctor search supports optional filters by name and specialty.
+If no filters are provided, all doctors are returned page by page.
 GET  /api/doctors/{doctorId}
 POST /api/doctors/{doctorId}/slots
 GET  /api/doctors/{doctorId}/schedule?date=YYYY-MM-DD

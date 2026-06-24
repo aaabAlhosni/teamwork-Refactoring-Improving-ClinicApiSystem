@@ -45,9 +45,11 @@ public class DoctorController {
         return new ResponseEntity<>(doctor, HttpStatus.CREATED);
     }
 
-    // Get doctors page by page
+    // Get doctors page by page with optional filters
     @GetMapping
     public Page<Doctor> getAllDoctors(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String specialty,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
 
@@ -60,7 +62,7 @@ public class DoctorController {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        return doctorService.getAllDoctors(pageable);
+        return doctorService.getAllDoctors(name, specialty, pageable);
     }
 
     // Get one doctor by ID

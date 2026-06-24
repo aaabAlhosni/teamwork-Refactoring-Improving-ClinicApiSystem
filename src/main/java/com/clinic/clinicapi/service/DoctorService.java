@@ -48,8 +48,40 @@ public class DoctorService {
                 );
     }
 
-    // Get doctors page by page
-    public Page<Doctor> getAllDoctors(Pageable pageable) {
+    // Get doctors page by page with optional search filters
+    public Page<Doctor> getAllDoctors(
+            String name,
+            String specialty,
+            Pageable pageable) {
+
+        boolean hasName = name != null && !name.trim().isEmpty();
+        boolean hasSpecialty = specialty != null && !specialty.trim().isEmpty();
+
+        if (hasName && hasSpecialty) {
+            return doctorRepository
+                    .findByNameContainingIgnoreCaseAndSpecialtyContainingIgnoreCase(
+                            name.trim(),
+                            specialty.trim(),
+                            pageable
+                    );
+        }
+
+        if (hasName) {
+            return doctorRepository
+                    .findByNameContainingIgnoreCase(
+                            name.trim(),
+                            pageable
+                    );
+        }
+
+        if (hasSpecialty) {
+            return doctorRepository
+                    .findBySpecialtyContainingIgnoreCase(
+                            specialty.trim(),
+                            pageable
+                    );
+        }
+
         return doctorRepository.findAll(pageable);
     }
 }
