@@ -4,7 +4,6 @@ import com.clinic.clinicapi.dto.DoctorRequest;
 import com.clinic.clinicapi.dto.GenerateSlotsRequest;
 import com.clinic.clinicapi.dto.AppointmentSlotResponseDto;
 import com.clinic.clinicapi.dto.DoctorResponseDto;
-import com.clinic.clinicapi.entity.AppointmentSlot;
 import com.clinic.clinicapi.entity.Doctor;
 import com.clinic.clinicapi.exception.BadRequestException;
 import com.clinic.clinicapi.service.AppointmentSlotService;
@@ -49,16 +48,7 @@ public class DoctorController {
         return new ResponseEntity<>(doctor, HttpStatus.CREATED);
     }
 
-    // Get doctors page by page with optional filters
-    @GetMapping
-    // Get all doctors
-    public List<DoctorResponseDto> getAllDoctors() {
-
-        return doctorService.getAllDoctors()
-                .stream()
-                .map(DoctorResponseDto::from)
-                .toList();
-    // Get doctors page by page
+    // Get all doctors page by page with optional filters
     @GetMapping
     public Page<Doctor> getAllDoctors(
             @RequestParam(required = false) String name,
