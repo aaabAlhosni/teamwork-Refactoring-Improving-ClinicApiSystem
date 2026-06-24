@@ -1,5 +1,6 @@
 package com.clinic.clinicapi.dto;
 
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
@@ -8,7 +9,8 @@ import java.time.LocalDate;
 public class GenerateSlotsRequest {
 
     // The date for the new slots
-    @NotNull
+    @NotNull(message = "Slot date is required")
+    @FutureOrPresent(message = "Slot date cannot be in the past")
     private LocalDate date;
 
     public LocalDate getDate() {

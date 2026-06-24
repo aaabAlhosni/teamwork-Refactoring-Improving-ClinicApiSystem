@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+# H2 runtime database files — generated at app startup, not source code
+data/
