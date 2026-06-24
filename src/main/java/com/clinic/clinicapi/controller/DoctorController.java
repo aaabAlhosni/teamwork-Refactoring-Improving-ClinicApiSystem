@@ -31,6 +31,7 @@ public class DoctorController {
         this.appointmentSlotService = appointmentSlotService;
     }
 
+    @PostMapping
     // Create a new doctor
     public ResponseEntity<DoctorResponseDto> createDoctor(
             @Valid @RequestBody DoctorRequest request) {
@@ -42,6 +43,7 @@ public class DoctorController {
         return new ResponseEntity<>(doctor, HttpStatus.CREATED);
     }
 
+    @GetMapping
     // Get all doctors
     public List<DoctorResponseDto> getAllDoctors() {
 
@@ -51,6 +53,7 @@ public class DoctorController {
                 .toList();
     }
 
+    @GetMapping("/{doctorId}")
     // Get one doctor by ID
     public DoctorResponseDto getDoctorById(
             @PathVariable("doctorId") Long doctorId) {
