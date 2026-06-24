@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
         return createResponse(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
-    // Returns 409 when a business rule is broken
+    // Returns 409 when a rule is broken
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<Map<String, String>> handleConflict(
             ConflictException exception) {
@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
         return createResponse(HttpStatus.CONFLICT, exception.getMessage());
     }
 
-    // Returns 400 when input data is not valid
+    // Returns 400 when input is not valid
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Map<String, String>> handleBadRequest(
             BadRequestException exception) {

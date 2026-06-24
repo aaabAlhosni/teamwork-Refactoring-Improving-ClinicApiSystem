@@ -22,9 +22,12 @@ public class PatientRequest {
     @Past(message = "Date of birth must be in the past")
     private LocalDate dateOfBirth;
 
-    // Phone number cannot be empty
-    @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^\\+?[0-9]{8,15}$", message = "Phone number must contain 8 to 15 digits and may start with +")
+    // Phone must be 8 digits and start with 9
+    @NotBlank
+    @Pattern(
+            regexp = "^9\\d{7}$",
+            message = "Phone number must be 8 digits and start with 9"
+    )
     private String phone;
 
     public String getName() {
