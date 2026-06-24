@@ -1,5 +1,6 @@
 package com.clinic.clinicapi.dto;
 
+import com.clinic.clinicapi.entity.Specialty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -13,14 +14,12 @@ public class DoctorRequest {
     // Doctor name cannot be empty
     @NotBlank(message = "Doctor name is required")
     @Size(min = 2, max = 100, message = "Doctor name must be between 2 and 100 characters")
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "Doctor name can contain letters and spaces only")
+    @Pattern(regexp = "^[A-Za-z. ]+$", message = "Doctor name can contain letters, dots and spaces only")
     private String name;
 
-    // Specialty cannot be empty
-    @NotBlank(message = "Specialty is required")
-    @Size(min = 2, max = 100, message = "Specialty must be between 2 and 100 characters")
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "Specialty can contain letters and spaces only")
-    private String specialty;
+    // Specialty must be selected from the predefined enum list
+    @NotNull(message = "Specialty is required")
+    private Specialty specialty;
 
     // Working start time is required
     @NotNull(message = "Working start time is required")
@@ -34,7 +33,7 @@ public class DoctorRequest {
         return name;
     }
 
-    public String getSpecialty() {
+    public Specialty getSpecialty() {
         return specialty;
     }
 
@@ -50,7 +49,7 @@ public class DoctorRequest {
         this.name = name;
     }
 
-    public void setSpecialty(String specialty) {
+    public void setSpecialty(Specialty specialty) {
         this.specialty = specialty;
     }
 

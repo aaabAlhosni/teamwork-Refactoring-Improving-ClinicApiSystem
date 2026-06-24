@@ -17,8 +17,9 @@ public class Doctor {
     // Doctor's full name
     private String name;
 
-    // Doctor's medical specialty
-    private String specialty;
+    // Doctor's medical specialty from predefined values
+    @Enumerated(EnumType.STRING)
+    private Specialty specialty;
 
     // Doctor's working start time
     private LocalTime workingStart;
@@ -31,7 +32,12 @@ public class Doctor {
     }
 
     // Constructor used to create a doctor object
-    public Doctor(String name, String specialty, LocalTime workingStart, LocalTime workingEnd) {
+    public Doctor(
+            String name,
+            Specialty specialty,
+            LocalTime workingStart,
+            LocalTime workingEnd) {
+
         this.name = name;
         this.specialty = specialty;
         this.workingStart = workingStart;
@@ -47,7 +53,7 @@ public class Doctor {
         return name;
     }
 
-    public String getSpecialty() {
+    public Specialty getSpecialty() {
         return specialty;
     }
 
@@ -64,7 +70,7 @@ public class Doctor {
         this.name = name;
     }
 
-    public void setSpecialty(String specialty) {
+    public void setSpecialty(Specialty specialty) {
         this.specialty = specialty;
     }
 
@@ -76,4 +82,3 @@ public class Doctor {
         this.workingEnd = workingEnd;
     }
 }
-

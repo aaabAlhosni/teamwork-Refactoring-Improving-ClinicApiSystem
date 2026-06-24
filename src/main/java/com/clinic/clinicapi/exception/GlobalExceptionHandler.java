@@ -1,11 +1,15 @@
 package com.clinic.clinicapi.exception;
 
+import com.clinic.clinicapi.entity.Specialty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +55,44 @@ public class GlobalExceptionHandler {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Validation failed");
         response.put("errors", errors);
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    // Returns 400 when enum value in request body is invalid
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidRequestBody(
+            HttpMessageNotReadableException exception) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Invalid request value");
+        response.put(
+                "error",
+                "Specialty must be one of: " + Arrays.toString(Specialty.values())
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    // Returns 400 when enum value in query parameter is invalid
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidQueryParameter(
+            MethodArgumentTypeMismatchException exception) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Invalid query parameter");
+
+        if ("specialty".equals(exception.getName())) {
+            response.put(
+                    "error",
+                    "Specialty must be one of: " + Arrays.toString(Specialty.values())
+            );
+        } else {
+            response.put(
+                    "error",
+                    exception.getName() + " has an invalid value"
+            );
+        }
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
